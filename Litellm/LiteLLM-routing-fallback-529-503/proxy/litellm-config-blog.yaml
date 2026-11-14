@@ -1,0 +1,50 @@
+# LiteLLM routing and fallback for Claude Opus 5.5 / Opus 5 on Amazon Bedrock.
+# Copied from the blog post. The aws_role_name ARNs use the placeholder account
+# 111111111111: replace them with your own role, or remove aws_role_name to use
+# the calling credentials.
+# Run: litellm --config proxy/litellm-config-blog.yaml
+model_list:
+  # Primary: EU profile, two entry Regions (entry-path redundancy, one serving Region)
+  - model_name: claude-opus
+    litellm_params:
+      model: bedrock/eu.anthropic.claude-opus-5-5
+      aws_region_name: eu-west-1
+      aws_role_name: "arn:aws:iam::111111111111:role/litellm-bedrock-invoke"
+      timeout: 300
+      requestMetadata: {app: "llm-gateway", route: "eu-primary"}
+  - model_name: claude-opus
+    litellm_params:
+      model: bedrock/eu.anthropic.claude-opus-5-5
+      aws_region_name: eu-north-1
+      aws_role_name: "arn:aws:iam::111111111111:role/litellm-bedrock-invoke"
+      timeout: 300
+      requestMetadata: {app: "llm-gateway", route: "eu-entry2"}
+
+  # Same-model routing: a profile verified to serve from a different Region
+  - model_name: claude-opus-global
+    litellm_params:
+      model: bedrock/global.anthropic.claude-opus-5-5
+      aws_region_name: eu-north-1
+      aws_role_name: "arn:aws:iam::111111111111:role/litellm-bedrock-invoke"
+      timeout: 300
+      requestMetadata: {app: "llm-gateway", route: "global"}
+
+  # Model fallback: a different model (in my test, also served from eu-north-1)
+  - model_name: claude-opus-5
+    litellm_params:
+      model: bedrock/eu.anthropic.claude-opus-5
+      aws_region_name: eu-west-1
+      aws_role_name: "arn:aws:iam::111111111111:role/litellm-bedrock-invoke"
+      timeout: 300
+      requestMetadata: {app: "llm-gateway", route: "model-fallback"}
+
+router_settings:
+  num_retries: 5          # default count; a 529 (APIError) uses this
+  allowed_fails: 2        # failures before a deployment is cooled down
+  cooldown_time: 30       # seconds a failing deployment is skipped
+  retry_policy:
+    RateLimitErrorRetries: 3          # 429
+    ServiceUnavailableErrorRetries: 5 # 503
+    TimeoutErrorRetries: 2
+  fallbacks:
+    - claude-opus: ["claude-opus-global", "claude-opus-5"]
