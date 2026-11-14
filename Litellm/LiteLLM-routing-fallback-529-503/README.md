@@ -36,7 +36,6 @@ sdk/
   cris-routing-by-model.py          # serving Region per model, 30 calls each
   cris-pinning-over-time.py         # serving Region over time (24 h, 15-minute rounds)
   cris-pinning-20261108-2340.csv    # output of the 24-hour run used in the post
-  litellm-sdk-cris-region-detector.py       # serving Region for one call, from invocation logs
   litellm-sdk-cris-prompt-cache-test.py     # cache write/read across Regions
   opus-long-generation-latency.py           # time to last token on long generations
   opus-long-generation-latency-20261114-2225.csv  # output of the latency run used in the post
@@ -76,7 +75,6 @@ Run these from the `sdk/` folder.
 |---|---|---|---|
 | `router_fallback_mock_test.py` | No | About 2 min | Exception type for 529 and 503, and the number of attempts across the three aliases. |
 | `router_fallback_live_test.py` | Yes | About 3 min | One request per alias, forced fallbacks, a 5-second timeout, and the invocation-log records. |
-| `litellm-sdk-cris-region-detector.py [eu\|us\|au\|jp\|global] [--region REGION]` | Yes | About 2 min | The serving Region for one call. The call must come from a Region inside the profile's geography. |
 | `cris-routing-by-model.py` | Yes | About 5 min | Serving Region for six models, 30 calls each. |
 | `cris-pinning-over-time.py --hours 24 --interval 15` | Yes | 24 h | Serving Region over time. Use `--hours 0.5 --interval 2` for a short check. Use `--report FILE.csv` to print a summary from a saved run. |
 | `litellm-sdk-cris-prompt-cache-test.py` | Yes | About 5 min | Cache writes and reads for the same prefix across geographies. |
