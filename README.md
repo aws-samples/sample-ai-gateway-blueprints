@@ -27,8 +27,8 @@ An AI gateway sits between your applications or agents and the models and tools 
 .
 ├── Litellm/
 │   ├── LiteLLM-routing-fallback-529-503/   # Bedrock failover with LiteLLM (proxy + SDK)
-│   │   ├── proxy/                          # LiteLLM proxy config.yaml templates
-│   │   ├── sdk/                            # Python litellm.Router equivalents
+│   │   ├── proxy/                          # LiteLLM proxy config for the routing and fallback setup
+│   │   ├── sdk/                            # Python Router tests and Bedrock placement measurement scripts
 │   │   └── images/                         # Architecture and behaviour diagrams
 │   └── litellm-mcp-gateway/                # (coming soon) LiteLLM as an MCP gateway
 └── AgentCore-gateway/                      # (coming soon) Amazon Bedrock AgentCore Gateway samples
@@ -38,9 +38,9 @@ An AI gateway sits between your applications or agents and the models and tools 
 
 | Blueprint | Gateway | Status | What it shows |
 |-----------|---------|--------|---------------|
-| [LiteLLM routing and failover for 529/503](Litellm/LiteLLM-routing-fallback-529-503/) | LiteLLM proxy and Python SDK | Available | Same-model (cross-Region) and cross-model failover for Claude on Bedrock, residency-aware pools, served-model observability |
-| [LiteLLM MCP gateway](Litellm/litellm-mcp-gateway/) | LiteLLM | Coming soon | Exposing and governing MCP tool servers through LiteLLM |
-| [AgentCore Gateway](AgentCore-gateway/) | Amazon Bedrock AgentCore Gateway | Coming soon | Turning APIs and Lambda functions into authenticated MCP tools for agents |
+| [LiteLLM routing and failover for 529/503](Litellm/LiteLLM-routing-fallback-529-503/) | LiteLLM proxy and Python SDK | Available | Failover from one Claude Opus 5.5 deployment to another (EU profile, then global profile), then to Claude Opus 5. Retry, cooldown and timeout settings for Bedrock overload errors, and scripts that measure which Region serves each call |
+| LiteLLM MCP gateway | LiteLLM | Coming soon | Exposing and governing MCP tool servers through LiteLLM |
+| AgentCore Gateway | Amazon Bedrock AgentCore Gateway | Coming soon | Turning APIs and Lambda functions into authenticated MCP tools for agents |
 
 ## Cost
 
