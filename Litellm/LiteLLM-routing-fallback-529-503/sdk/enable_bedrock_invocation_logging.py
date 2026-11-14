@@ -239,7 +239,7 @@ def enable_logging(region: str, bucket: str, role_arn: str):
             msg = e.response["Error"].get("Message", "")
             if "not authorized" in msg or "assume" in msg.lower() or "role" in msg.lower():
                 print(f"    waiting for IAM propagation (attempt {attempt})...")
-                time.sleep(10)
+                time.sleep(10)  # nosemgrep: arbitrary-sleep
                 continue
             raise
     raise last

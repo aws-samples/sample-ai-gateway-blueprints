@@ -15,7 +15,7 @@ CONFIG = os.path.join(HERE, "..", "proxy", "litellm-config-blog.yaml")
 litellm.suppress_debug_info = True
 
 def load_blog_config():
-    cfg = yaml.safe_load(open(CONFIG))
+    cfg = yaml.safe_load(open(CONFIG, encoding="utf-8"))
     role = os.environ.get("LITELLM_ROLE_ARN")  # optional: your own role ARN
     for d in cfg["model_list"]:
         if role:

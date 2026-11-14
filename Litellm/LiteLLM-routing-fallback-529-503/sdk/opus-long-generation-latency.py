@@ -85,7 +85,7 @@ def main():
 
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
     out = f"opus-long-generation-latency-{stamp}.csv"
-    with open(out, "w", newline="") as fh:
+    with open(out, "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=["i", "tag", "seconds", "out_tokens", "in_tokens", "finish"])
         w.writeheader(); w.writerows(sorted(rows, key=lambda r: r["i"]))
 

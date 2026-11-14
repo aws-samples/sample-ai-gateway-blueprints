@@ -122,7 +122,7 @@ def main():
     first_tag, first_u = call("eu", "eu-west-1")
     a_regions = [show("A1 (cold build expected)", first_tag, first_u, "eu-west-1")]
     for i in range(2, 7):
-        time.sleep(2)
+        time.sleep(2)  # nosemgrep: arbitrary-sleep
         t, u = call("eu", "eu-west-1")
         a_regions.append(show(f"A{i}", t, u, "eu-west-1"))
 

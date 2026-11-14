@@ -141,7 +141,7 @@ def run(hours, interval_min, calls, out_csv):
     print(f"{len(TARGETS)} targets x {calls} calls x {rounds} rounds "
           f"(every {interval_min} min for {hours} h) -> {out_csv}")
     new = not os.path.exists(out_csv)
-    with open(out_csv, "a", newline="") as fh:
+    with open(out_csv, "a", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=FIELDS)
         if new:
             w.writeheader()
@@ -151,7 +151,7 @@ def run(hours, interval_min, calls, out_csv):
             jobs = [(rnd, *t) for t in TARGETS for _ in range(calls)]
             with ThreadPoolExecutor(max_workers=8) as ex:
                 rows = list(ex.map(lambda j: one_call(*j), jobs))
-            time.sleep(45)  # invocation logs land with some delay
+            time.sleep(45)  # invocation logs land with some delay  # nosemgrep: arbitrary-sleep
             resolve(rows, since_ms)
             w.writerows(rows)
             fh.flush()
@@ -169,7 +169,7 @@ def run(hours, interval_min, calls, out_csv):
 
 
 def report(csv_path):
-    with open(csv_path) as fh:
+    with open(csv_path, encoding="utf-8") as fh:
         rows = list(csv.DictReader(fh))
     by_target = defaultdict(list)
     for r in rows:

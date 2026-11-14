@@ -66,7 +66,7 @@ for m in MODELS:
     print(f"{m}: {ok} ok, {fail} failed")
 
 print(f"\n{len(pending)} calls made; waiting for invocation logs...")
-time.sleep(60)
+time.sleep(60)  # nosemgrep: arbitrary-sleep
 
 tagmap = {}
 logs = boto3.client("logs", region_name=ENTRY)
@@ -81,7 +81,8 @@ for _ in range(10):
         for e in r.get("events", []):
             try:
                 rec = json.loads(e["message"])
-            except Exception:
+            except (json.JSONDecodeError, KeyError) as exc:
+                print(f"  skipped unparseable invocation-log event: {exc}")
                 continue
             t = rec.get("requestMetadata", {}).get("trace_tag", "")
             if t.startswith("bymodel-"):
@@ -92,7 +93,7 @@ for _ in range(10):
     if all(t in tagmap for t, _ in pending):
         break
     print(f"  resolved {sum(t in tagmap for t,_ in pending)}/{len(pending)}; waiting 20s")
-    time.sleep(20)
+    time.sleep(20)  # nosemgrep: arbitrary-sleep
 
 dist = defaultdict(Counter)
 for tag, m in pending:

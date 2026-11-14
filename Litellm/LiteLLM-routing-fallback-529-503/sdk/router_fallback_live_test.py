@@ -24,7 +24,7 @@ CONFIG = os.path.join(HERE, "..", "proxy", "litellm-config-blog.yaml")
 litellm.suppress_debug_info = True
 
 def load_blog_config():
-    cfg = yaml.safe_load(open(CONFIG))
+    cfg = yaml.safe_load(open(CONFIG, encoding="utf-8"))
     role = os.environ.get("LITELLM_ROLE_ARN")  # optional: your own role ARN
     for d in cfg["model_list"]:
         if role:
@@ -90,7 +90,7 @@ except Exception as e:
 
 # ---- invocation logs: which deployment really answered ----------------------
 print("\nwaiting 60s for invocation logs...", flush=True)
-time.sleep(60)
+time.sleep(60)  # nosemgrep: arbitrary-sleep
 print("\n######## Invocation-log records with requestMetadata.app=llm-gateway ########")
 for region in ("eu-west-1", "eu-north-1"):
     logs = boto3.client("logs", region_name=region)
@@ -99,7 +99,7 @@ for region in ("eu-west-1", "eu-north-1"):
                                      filterPattern='"llm-gateway"').get("events", [])
         if evs:
             break
-        time.sleep(20)
+        time.sleep(20)  # nosemgrep: arbitrary-sleep
     for e in evs:
         rec = json.loads(e["message"])
         print(f"  logGroupRegion={region:10} time={rec.get('timestamp')} modelId={rec.get('modelId').split('/')[-1]:34} "
