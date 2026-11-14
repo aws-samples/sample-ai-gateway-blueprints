@@ -31,7 +31,7 @@ Run
   python cris-pinning-over-time.py --report cris-pinning-20261108-2100.csv
 
 Prereqs: model invocation logging enabled in every entry Region below.
-Cost: tiny prompts, max_tokens=5. 24h at 15 min x 5 calls x 4 targets = 1,920 calls.
+Cost: tiny prompts, max_tokens=5. 24h at 15 min x 5 calls x 3 targets = 1,440 calls.
 """
 
 import argparse
@@ -59,7 +59,6 @@ TARGETS = [
     ("opus-eu@eu-west-1",      "eu.anthropic.claude-opus-5-5",     "eu-west-1"),
     ("opus-eu@eu-north-1",     "eu.anthropic.claude-opus-5-5",     "eu-north-1"),
     ("opus-global@eu-north-1", "global.anthropic.claude-opus-5-5", "eu-north-1"),
-    ("sonnet-eu@eu-west-1",    "eu.anthropic.claude-sonnet-4-5-20250929-v1:0", "eu-west-1"),
 ]
 
 FIELDS = ["ts_utc", "round", "target", "profile", "entry_region", "trace_tag",
