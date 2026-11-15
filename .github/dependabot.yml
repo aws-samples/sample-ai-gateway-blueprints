@@ -1,0 +1,14 @@
+# Dependabot version updates.
+# Each entry needs a unique package-ecosystem + directory pair; a duplicate
+# makes the whole file invalid and Dependabot runs nothing.
+# https://docs.github.com/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+#
+# Python packages are not listed: the samples pin litellm==1.109.1 on purpose,
+# because the documented retry and fallback behaviour was verified on that version.
+version: 2
+updates:
+  # GitHub Actions used in .github/workflows (directory "/" means the default location)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

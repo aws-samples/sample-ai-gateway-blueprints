@@ -1,5 +1,12 @@
 # AI Gateway Blueprints for Amazon Bedrock
 
+[![Checkov](https://github.com/aws-samples/llm-gateway-blueprints/actions/workflows/checkov.yml/badge.svg?branch=main)](https://github.com/aws-samples/llm-gateway-blueprints/actions/workflows/checkov.yml)
+[![CodeQL](https://github.com/aws-samples/llm-gateway-blueprints/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/aws-samples/llm-gateway-blueprints/actions/workflows/github-code-scanning/codeql)
+[![Python](https://github.com/aws-samples/llm-gateway-blueprints/actions/workflows/python.yml/badge.svg?branch=main)](https://github.com/aws-samples/llm-gateway-blueprints/actions/workflows/python.yml)
+[![Links](https://github.com/aws-samples/llm-gateway-blueprints/actions/workflows/links.yml/badge.svg?branch=main)](https://github.com/aws-samples/llm-gateway-blueprints/actions/workflows/links.yml)
+[![LiteLLM 1.109.1](https://img.shields.io/badge/LiteLLM-1.109.1-informational)](https://github.com/BerriAI/litellm/releases/tag/v1.109.1)
+[![License: MIT-0](https://img.shields.io/badge/license-MIT--0-blue)](LICENSE)
+
 Reference configurations and code samples for running an **AI gateway** in front of [Amazon Bedrock](https://aws.amazon.com/bedrock/). Each blueprint targets one problem you hit when you take generative AI workloads to production: routing and failover, capacity and throttling, data residency, observability, and governed access to tools through the Model Context Protocol (MCP).
 
 The samples cover two gateway families:

@@ -1,0 +1,54 @@
+name: Python
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      # Actions are pinned to commit SHAs; Dependabot updates the SHA and version comment.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Install ruff
+        run: pip install "ruff==0.17.*"
+      # Only rules that catch real bugs: syntax errors, undefined names,
+      # invalid comparisons and misplaced statements. Style is left to authors.
+      - name: Lint
+        run: ruff check --output-format=github --select E9,F63,F7,F82 .
+      - name: Compile
+        run: python -m compileall -q .
+
+  # Runs the offline LiteLLM Router test against the blog config.
+  # Every Bedrock call is answered by an httpx MockTransport, so no AWS
+  # credentials are configured and no model is invoked.
+  mock-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: Litellm/LiteLLM-routing-fallback-529-503/sdk
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      # Same version the README documents and the results were measured on.
+      - name: Install dependencies
+        run: pip install "litellm==1.109.1" pyyaml
+      - name: Router fallback mock test
+        env:
+          AWS_DEFAULT_REGION: eu-west-1
+          AWS_EC2_METADATA_DISABLED: "true"
+        run: python router_fallback_mock_test.py
