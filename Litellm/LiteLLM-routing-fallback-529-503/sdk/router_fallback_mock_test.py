@@ -11,7 +11,7 @@ import litellm
 from litellm import Router
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-CONFIG = os.path.join(HERE, "..", "proxy", "litellm-config-blog.yaml")
+CONFIG = os.path.join(HERE, "..", "proxy", "litellm-config.yaml")
 litellm.suppress_debug_info = True
 
 def load_blog_config():

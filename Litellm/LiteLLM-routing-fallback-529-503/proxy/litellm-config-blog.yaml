@@ -2,7 +2,7 @@
 # Copied from the blog post. The aws_role_name ARNs use the placeholder account
 # 111111111111: replace them with your own role, or remove aws_role_name to use
 # the calling credentials.
-# Run: litellm --config proxy/litellm-config-blog.yaml
+# Run: litellm --config proxy/litellm-config.yaml
 model_list:
   # Primary: EU profile, two entry Regions (entry-path redundancy, one serving Region)
   - model_name: claude-opus

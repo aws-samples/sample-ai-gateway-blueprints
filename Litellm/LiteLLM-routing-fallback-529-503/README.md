@@ -4,7 +4,7 @@
 
 Code for the post "Handle Anthropic overload errors on Amazon Bedrock with LiteLLM". It covers:
 
-- The LiteLLM routing and fallback config from the post (`proxy/litellm-config-blog.yaml`).
+- The LiteLLM routing and fallback config from the post (`proxy/litellm-config.yaml`).
 - Tests that show how LiteLLM 1.109.1 handles Bedrock 529 and 503 errors, and how it retries and falls back.
 - Measurements of where Claude Opus 5.5 and Opus 5 requests are served, how long long generations take, and how prompts are cached.
 
@@ -29,7 +29,7 @@ Caveats:
 
 ```
 proxy/
-  litellm-config-blog.yaml          # model_list and router_settings from the post
+  litellm-config.yaml          # model_list and router_settings from the post
 sdk/
   router_fallback_mock_test.py      # mocked 529/503: exception types and retry/fallback counts (no AWS calls)
   router_fallback_live_test.py      # live Router test: each alias, forced fallback, timeout, invocation-log check
@@ -53,7 +53,7 @@ sdk/
 
 ## Configuration
 
-`proxy/litellm-config-blog.yaml` uses the placeholder account `111111111111` in its `aws_role_name` values. Do either of these:
+`proxy/litellm-config.yaml` uses the placeholder account `111111111111` in its `aws_role_name` values. Do either of these:
 
 - Set `LITELLM_ROLE_ARN` to a role your identity can assume. The live test uses it for every deployment.
 - Leave it unset. The live test drops `aws_role_name` and uses your calling credentials.
@@ -62,7 +62,6 @@ To run the gateway with the config:
 
 ```bash
 pip install "litellm[proxy]==1.109.1"
-litellm --config proxy/litellm-config-blog.yaml
 ```
 
 Replace the account in `aws_role_name` first, or remove those lines.
