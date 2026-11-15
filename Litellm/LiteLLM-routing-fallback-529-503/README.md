@@ -2,7 +2,7 @@
 
 ![LiteLLM on Amazon Bedrock architecture](./images/litellm-bedrock-architecture.svg)
 
-Code for the blog post "Handle Anthropic overload errors on Amazon Bedrock with LiteLLM". It covers:
+Code for the post "Handle Anthropic overload errors on Amazon Bedrock with LiteLLM". It covers:
 
 - The LiteLLM routing and fallback config from the post (`proxy/litellm-config-blog.yaml`).
 - Tests that show how LiteLLM 1.109.1 handles Bedrock 529 and 503 errors, and how it retries and falls back.
@@ -40,7 +40,6 @@ sdk/
   opus-long-generation-latency.py           # time to last token on long generations
   opus-long-generation-latency-20261114-2225.csv  # output of the latency run used in the post
   enable_bedrock_invocation_logging.py      # enables invocation logging in each Region (needed by the log-based tests)
-README-blueprint-draft.md           # earlier draft README, kept for reference
 ```
 
 ## Prerequisites
@@ -50,6 +49,7 @@ README-blueprint-draft.md           # earlier draft README, kept for reference
 - AWS credentials in your shell, for example from `aws login` or a named profile. The scripts never read static keys from the code.
 - An IAM identity allowed to call `bedrock:InvokeModel` on the profiles you use. The log-based tests also need `logs:FilterLogEvents` on the log group, and `cloudtrail:LookupEvents` if you check CloudTrail.
 - Model invocation logging enabled to CloudWatch Logs in each Region you call from. Run `sdk/enable_bedrock_invocation_logging.py` to set it up. It creates an S3 bucket, a log group and an IAM role in each Region.
+- An existing LiteLLM configuration with Amazon Bedrock running in your environment.
 
 ## Configuration
 
