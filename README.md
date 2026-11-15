@@ -1,7 +1,7 @@
 # AI Gateway Blueprints for Amazon Bedrock
 
-[![Checkov](https://github.com/aws-samples/ai-gateway-blueprints/actions/workflows/checkov.yml/badge.svg?branch=main)](https://github.com/aws-samples/ai-gateway-blueprints/actions/workflows/checkov.yml)
-[![CodeQL](https://github.com/aws-samples/ai-gateway-blueprints/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/aws-samples/ai-gateway-blueprints/actions/workflows/github-code-scanning/codeql)
+[![Checkov](https://github.com/aws-samples/sample-ai-gateway-blueprints/actions/workflows/checkov.yml/badge.svg?branch=main)](https://github.com/aws-samples/sample-ai-gateway-blueprints/actions/workflows/checkov.yml)
+[![CodeQL](https://github.com/aws-samples/sample-ai-gateway-blueprints/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/aws-samples/sample-ai-gateway-blueprints/actions/workflows/github-code-scanning/codeql)
 [![License: MIT-0](https://img.shields.io/badge/license-MIT--0-blue)](LICENSE)
 
 Reference configurations and code samples for running an **AI gateway** in front of [Amazon Bedrock](https://aws.amazon.com/bedrock/). Each blueprint targets one problem you hit when you take generative AI workloads to production: routing and failover, capacity and throttling, data residency, observability, and governed access to tools through the Model Context Protocol (MCP).
