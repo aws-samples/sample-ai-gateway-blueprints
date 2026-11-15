@@ -62,6 +62,7 @@ To run the gateway with the config:
 
 ```bash
 pip install "litellm[proxy]==1.109.1"
+python sdk/cris-routing-by-model.py
 ```
 
 Replace the account in `aws_role_name` first, or remove those lines.
