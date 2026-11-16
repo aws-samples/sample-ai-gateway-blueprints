@@ -2,7 +2,7 @@
 Does CRIS placement stay on one serving Region over time?
 
 cris-routing-by-model.py shows placement in a single burst. This script answers
-the follow-up question for the blog: does the serving Region for a given
+the follow-up question: does the serving Region for a given
 (account, entry Region, model, profile) stay fixed for hours, or does it move?
 
 Method

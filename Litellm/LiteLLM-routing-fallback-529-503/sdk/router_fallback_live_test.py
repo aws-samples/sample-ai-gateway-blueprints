@@ -1,8 +1,9 @@
 """Live Router test: sends one request per alias, forces failures to show fallback order, and reads the invocation logs."""
 """
-Q4: load the blog's model_list + router_settings into the LiteLLM Router and
-send real requests. aws_role_name is removed (the blog uses a placeholder
-account 111111111111); calls use the local IAM credentials instead.
+Load the model_list + router_settings from proxy/litellm-config.yaml into the
+LiteLLM Router and send real requests. The config uses the placeholder account
+111111111111, so aws_role_name is replaced with LITELLM_ROLE_ARN if set, or
+removed so calls use the local IAM credentials.
 Then resolve every call's route tag + inferenceRegion from invocation logs.
 """
 import copy
@@ -23,7 +24,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CONFIG = os.path.join(HERE, "..", "proxy", "litellm-config.yaml")
 litellm.suppress_debug_info = True
 
-def load_blog_config():
+def load_config():
     cfg = yaml.safe_load(open(CONFIG, encoding="utf-8"))
     role = os.environ.get("LITELLM_ROLE_ARN")  # optional: your own role ARN
     for d in cfg["model_list"]:
@@ -36,7 +37,7 @@ def load_blog_config():
 MSG = [{"role": "user", "content": "Reply with one word: ok"}]
 litellm.suppress_debug_info = True
 
-cfg = load_blog_config()
+cfg = load_config()
 RS = dict(cfg["router_settings"])
 T0 = int(time.time() * 1000)
 

@@ -49,7 +49,7 @@ LOG_GROUP = "/aws/bedrock/model-invocations"
 # A large, STABLE prefix (identical every call) so the same cache checkpoint is
 # reused. Opus cache minimum is ~1024 tokens; this is comfortably above it.
 STABLE_PREFIX = (
-    "You are a financial-markets assistant for a systematic trading firm.\n"
+    "You are a research assistant for an analytics team.\n"
     "Reference context (do not summarise, just hold in context):\n"
     + ("Historical note: markets fluctuate; past performance is not indicative "
        "of future results. " * 220)

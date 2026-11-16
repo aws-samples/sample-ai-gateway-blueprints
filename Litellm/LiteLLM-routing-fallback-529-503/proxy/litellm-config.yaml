@@ -1,5 +1,5 @@
 # LiteLLM routing and fallback for Claude Opus 5.5 / Opus 5 on Amazon Bedrock.
-# Copied from the blog post. The aws_role_name ARNs use the placeholder account
+# The aws_role_name ARNs use the placeholder account
 # 111111111111: replace them with your own role, or remove aws_role_name to use
 # the calling credentials.
 # Snippet: merge model_list and router_settings into your existing LiteLLM
@@ -30,7 +30,7 @@ model_list:
       timeout: 300
       requestMetadata: {app: "llm-gateway", route: "global"}
 
-  # Model fallback: a different model (in my test, also served from eu-north-1)
+  # Model fallback: a different model (in our test, also served from eu-north-1)
   - model_name: claude-opus-5
     litellm_params:
       model: bedrock/eu.anthropic.claude-opus-5

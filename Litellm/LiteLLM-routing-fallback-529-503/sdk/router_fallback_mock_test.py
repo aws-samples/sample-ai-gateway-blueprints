@@ -1,7 +1,7 @@
-"""Mocked Bedrock responses (no AWS calls): checks how the blog config retries and falls back on 529 and 503."""
+"""Mocked Bedrock responses (no AWS calls): checks how proxy/litellm-config.yaml retries and falls back on 529 and 503."""
 """
-Q3 / Q4 support: how LiteLLM 1.109.1 maps a Bedrock 529 and 503, and what the
-blog's router_settings actually do with them. No AWS calls: every Bedrock HTTP
+How LiteLLM 1.109.1 maps a Bedrock 529 and 503, and what the router_settings
+in proxy/litellm-config.yaml actually do with them. No AWS calls: every Bedrock HTTP
 request is answered by an httpx MockTransport, and each hit is recorded.
 """
 import logging
@@ -14,7 +14,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CONFIG = os.path.join(HERE, "..", "proxy", "litellm-config.yaml")
 litellm.suppress_debug_info = True
 
-def load_blog_config():
+def load_config():
     cfg = yaml.safe_load(open(CONFIG, encoding="utf-8"))
     role = os.environ.get("LITELLM_ROLE_ARN")  # optional: your own role ARN
     for d in cfg["model_list"]:
@@ -67,14 +67,14 @@ for status in (529, 503):
         print(f"HTTP {status} -> {type(e).__module__}.{type(e).__name__}  "
               f"status_code={getattr(e, 'status_code', None)}  MRO={[c.__name__ for c in type(e).__mro__[:4]]}  hits={len(hits)}")
 
-# ---- 2. Blog config through the Router, every deployment answering 529 / 503
-cfg = load_blog_config()
+# ---- 2. Sample config through the Router, every deployment answering 529 / 503
+cfg = load_config()
 
 rs = dict(cfg["router_settings"])
-print("\nrouter_settings from blog:", rs)
+print("\nrouter_settings from config:", rs)
 
 for status in (529, 503):
-    print(f"\n=== 2. Router(blog config), every Bedrock call returns HTTP {status} ===")
+    print(f"\n=== 2. Router(sample config), every Bedrock call returns HTTP {status} ===")
     hits = []
     client = mock_client(status, hits)
     router = Router(model_list=cfg["model_list"], **rs)

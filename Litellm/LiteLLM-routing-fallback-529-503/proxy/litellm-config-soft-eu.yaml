@@ -1,0 +1,146 @@
+# ===========================================================================
+# Claude Opus 5.5 on Amazon Bedrock: SOFT EU-FIRST (weighted) routing (LiteLLM
+# proxy). SDK equivalent: ../sdk/litellm-router-soft-eu.py
+# Hard counterpart: litellm-config-hard-eu.yaml
+#
+# Use case: high availability, EU-primary, no data-residency requirement
+# (normal traffic already goes to US, JP and AU, and failover adds global).
+#
+# DESIGN
+# ---------------------------------------------------------------------------
+# Applications call one alias, claude-opus-5-5. Its pool holds one geo profile
+# per geography, because two entries on the same geo profile serve from the
+# same Region and are not independent capacity. Measured in one account
+# (placement can differ in yours; measure it with ../sdk/):
+#     eu. -> eu-north-1      us. -> us-east-1      jp. -> ap-northeast-1
+#     au. -> ap-southeast-4  global. -> worldwide (ap-southeast-4 when measured)
+#
+# ROUTING SEMANTICS
+# ---------------------------------------------------------------------------
+# simple-shuffle is a WEIGHTED RANDOM pick, not strict priority. Weights here:
+# EU 10 (two entries of 5), US 3, JP 2, AU 1. Under normal load EU gets about
+# 10/16 (63%) of traffic and the other geos take the rest. Measured on LiteLLM
+# 1.109.1 over 20,000 picks: EU 62%, US 19%, JP 12%, AU 6%.
+# For "EU unless EU is down", use litellm-config-hard-eu.yaml instead.
+#
+# CACHE TRADE-OFF
+# ---------------------------------------------------------------------------
+# Prompt caches are per serving Region. Spreading normal traffic across four
+# geos keeps up to four regional caches warm, and each pays a full cache write
+# when it expires, even when nothing is wrong. The hard config avoids that
+# standing cost with the same failover coverage.
+#
+# FAILOVER LAYERS
+# ---------------------------------------------------------------------------
+#   1. Within the pool: retries and per-deployment cooldown move requests off
+#      a failing geo; the remaining geos absorb its share.
+#   2. Cross-alias `fallbacks`: if the whole pool is unavailable, requests go
+#      to claude-opus-5-5-global (the global profile).
+#
+# MODEL ID: "<geo>.anthropic.claude-opus-5-5" with no "-v1:0" suffix. Each geo
+# profile must be called from a Region inside that geo.
+# TRACEABILITY: requestMetadata tags land in Bedrock model invocation logs in
+# the entry Region; read `inferenceRegion` there for the actual serving Region.
+#
+# Replace the placeholder account 111111111111 in aws_role_name, or remove
+# aws_role_name to use the gateway's own credentials. Tested on LiteLLM 1.109.1.
+# ===========================================================================
+
+model_list:
+  # =========================================================================
+  # PRIMARY ALIAS: claude-opus-5-5 (all geos in one weighted pool).
+  # =========================================================================
+
+  # --- EU: total weight 10, split across two entry Regions -----------------
+  # Both entries serve from eu-north-1, so the second one adds entry-path
+  # redundancy only, not serving capacity.
+  - model_name: claude-opus-5-5
+    litellm_params:
+      model: bedrock/eu.anthropic.claude-opus-5-5
+      aws_region_name: eu-central-1
+      aws_role_name: "arn:aws:iam::111111111111:role/litellm-bedrock-invoke"
+      timeout: 300
+      weight: 5
+      requestMetadata: {app: "litellm-proxy", alias: "claude-opus-5-5", geo: "eu", tier: "primary", entry_region: "eu-central-1"}
+
+  - model_name: claude-opus-5-5
+    litellm_params:
+      model: bedrock/eu.anthropic.claude-opus-5-5
+      aws_region_name: eu-west-1
+      aws_role_name: "arn:aws:iam::111111111111:role/litellm-bedrock-invoke"
+      timeout: 300
+      weight: 5
+      requestMetadata: {app: "litellm-proxy", alias: "claude-opus-5-5", geo: "eu", tier: "primary-entry2", entry_region: "eu-west-1"}
+
+  # --- US: weight 3 (serves from us-east-1) --------------------------------
+  - model_name: claude-opus-5-5
+    litellm_params:
+      model: bedrock/us.anthropic.claude-opus-5-5
+      aws_region_name: us-east-1
+      aws_role_name: "arn:aws:iam::111111111111:role/litellm-bedrock-invoke"
+      timeout: 300
+      weight: 3
+      requestMetadata: {app: "litellm-proxy", alias: "claude-opus-5-5", geo: "us", tier: "secondary", entry_region: "us-east-1"}
+
+  # --- JP: weight 2 (serves from ap-northeast-1) ---------------------------
+  - model_name: claude-opus-5-5
+    litellm_params:
+      model: bedrock/jp.anthropic.claude-opus-5-5
+      aws_region_name: ap-northeast-1
+      aws_role_name: "arn:aws:iam::111111111111:role/litellm-bedrock-invoke"
+      timeout: 300
+      weight: 2
+      requestMetadata: {app: "litellm-proxy", alias: "claude-opus-5-5", geo: "jp", tier: "secondary", entry_region: "ap-northeast-1"}
+
+  # --- AU: weight 1 (serves from ap-southeast-4) ---------------------------
+  # Lowest weight because global also landed on ap-southeast-4 when measured.
+  - model_name: claude-opus-5-5
+    litellm_params:
+      model: bedrock/au.anthropic.claude-opus-5-5
+      aws_region_name: ap-southeast-2
+      aws_role_name: "arn:aws:iam::111111111111:role/litellm-bedrock-invoke"
+      timeout: 300
+      weight: 1
+      requestMetadata: {app: "litellm-proxy", alias: "claude-opus-5-5", geo: "au", tier: "secondary-last", entry_region: "ap-southeast-2"}
+
+  # =========================================================================
+  # LAST-RESORT ALIAS: claude-opus-5-5-global, used only through `fallbacks`
+  # when the whole primary pool is unavailable. Two entry Regions (EU and US).
+  # =========================================================================
+  - model_name: claude-opus-5-5-global
+    litellm_params:
+      model: bedrock/global.anthropic.claude-opus-5-5
+      aws_region_name: eu-central-1
+      aws_role_name: "arn:aws:iam::111111111111:role/litellm-bedrock-invoke"
+      timeout: 300
+      requestMetadata: {app: "litellm-proxy", alias: "claude-opus-5-5-global", geo: "global", tier: "last-resort", entry_region: "eu-central-1"}
+
+  - model_name: claude-opus-5-5-global
+    litellm_params:
+      model: bedrock/global.anthropic.claude-opus-5-5
+      aws_region_name: us-east-1
+      aws_role_name: "arn:aws:iam::111111111111:role/litellm-bedrock-invoke"
+      timeout: 300
+      requestMetadata: {app: "litellm-proxy", alias: "claude-opus-5-5-global", geo: "global", tier: "last-resort", entry_region: "us-east-1"}
+
+router_settings:
+  routing_strategy: simple-shuffle   # weighted random pick using `weight`
+  num_retries: 5                     # default count; a 529 (APIError) uses this
+  retry_after: 1
+  allowed_fails: 2                   # failures before a deployment is cooled down
+  cooldown_time: 30                  # seconds a failing deployment is skipped
+  retry_policy:
+    RateLimitErrorRetries: 3           # 429
+    ServiceUnavailableErrorRetries: 5  # 503
+    InternalServerErrorRetries: 3      # 500
+    TimeoutErrorRetries: 2
+  enable_pre_call_checks: true
+
+  fallbacks:
+    - claude-opus-5-5: ["claude-opus-5-5-global"]
+
+litellm_settings:
+  drop_params: true
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY

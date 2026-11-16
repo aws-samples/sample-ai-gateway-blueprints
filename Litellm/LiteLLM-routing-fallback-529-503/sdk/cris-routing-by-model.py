@@ -7,10 +7,10 @@ three Regions, and says "routing behavior varies by model; some models route
 dynamically across Regions based on real-time capacity, while others run in a
 fixed inference Region."
 
-Our earlier measurement showed Claude Opus 5.5 pinned ~100% to one Region. This
+A single-model measurement showed Claude Opus 5.5 pinned ~100% to one Region. This
 script tests several US-geo models side by side, same account, same entry Region,
 same moment, and tallies the ACTUAL serving Region from Bedrock model invocation
-logs (inferenceRegion). It is the evidence for the blog's serving-Region claim.
+logs (inferenceRegion).
 
 Run:
     python cris-routing-by-model.py
