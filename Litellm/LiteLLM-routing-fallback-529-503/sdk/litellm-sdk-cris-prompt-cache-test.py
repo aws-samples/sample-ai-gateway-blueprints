@@ -31,7 +31,7 @@ PREREQS: model invocation logging enabled in the entry regions used below
 (see enable_bedrock_invocation_logging.py) so inferenceRegion can be resolved.
 
 Run:
-    pip install litellm aws-bedrock-token-generator boto3
+    pip install -r ../requirements.txt
     python litellm-sdk-cris-prompt-cache-test.py
 """
 

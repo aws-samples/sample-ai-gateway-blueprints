@@ -16,10 +16,10 @@ Serving Regions measured in one account (placement can differ in yours):
 No data-residency constraint is assumed: failover sends requests outside the EU.
 
 Credentials: set LITELLM_ROLE_ARN to a role to assume, or leave it unset to use
-your calling credentials. Tested on LiteLLM 1.109.1.
+your calling credentials. Tested with the versions in ../requirements.txt.
 
 Run:
-    pip install "litellm==1.109.1"
+    pip install -r ../requirements.txt
     python litellm-router-hard-eu.py
 """
 

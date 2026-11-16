@@ -2,9 +2,6 @@
 # Each entry needs a unique package-ecosystem + directory pair; a duplicate
 # makes the whole file invalid and Dependabot runs nothing.
 # https://docs.github.com/code-security/dependabot/working-with-dependabot/dependabot-options-reference
-#
-# Python packages are not listed: the samples pin litellm==1.109.1 on purpose,
-# because the documented retry and fallback behaviour was verified on that version.
 version: 2
 updates:
   # GitHub Actions used in .github/workflows (directory "/" means the default location)
@@ -12,3 +9,15 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+
+  # Python packages pinned in requirements.txt, including litellm. The Python
+  # workflow's mock test fails a litellm bump that changes the documented retry
+  # and fallback behaviour, so review those PRs before merging.
+  - package-ecosystem: "pip"
+    directory: "/Litellm/LiteLLM-routing-fallback-529-503"
+    schedule:
+      interval: "weekly"
+    ignore:
+      # 3.11+ drops Python 3.10, which the sample supports.
+      - dependency-name: "matplotlib"
+        versions: [">=3.11"]

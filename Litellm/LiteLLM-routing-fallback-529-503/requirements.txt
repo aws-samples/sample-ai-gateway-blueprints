@@ -1,0 +1,10 @@
+# Exact versions the samples are tested with. Dependabot proposes updates, and
+# CI runs sdk/router_fallback_mock_test.py on each proposal: it fails if a new
+# LiteLLM changes the documented retry and fallback behaviour.
+litellm==1.109.1
+boto3==1.44.3
+aws-bedrock-token-generator==1.1.0
+pyyaml==6.0.3
+# Optional: only cris-pinning-over-time.py uses it, for the chart.
+# 3.10.x is the last line that supports Python 3.10.
+matplotlib==3.10.9

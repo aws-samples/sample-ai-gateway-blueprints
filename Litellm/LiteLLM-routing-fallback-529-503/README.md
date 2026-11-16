@@ -5,7 +5,7 @@ When an Anthropic model on Amazon Bedrock runs short of serving capacity, reques
 This sample shows how to keep a LiteLLM gateway serving through that kind of event. It contains:
 
 - A LiteLLM routing and fallback configuration for Claude Opus 5.5 and Claude Opus 5 (`proxy/litellm-config.yaml`).
-- Tests that show how LiteLLM 1.109.1 classifies Bedrock 529 and 503 errors, and how it retries and falls back.
+- Tests that show how LiteLLM classifies Bedrock 529 and 503 errors, and how it retries and falls back.
 - Scripts that measure which Region serves each request, how long long generations take, and how prompt caches behave across Regions.
 
 ![LiteLLM on Amazon Bedrock architecture](./images/litellm-bedrock-architecture.svg)
@@ -24,7 +24,7 @@ Three Bedrock errors look alike on a dashboard and need different responses.
 
 More quota doesn't fix a capacity problem on the service side. Patient retries and another place to send the request do. For the full definitions, see [Troubleshooting Amazon Bedrock API error codes](https://docs.aws.amazon.com/bedrock/latest/userguide/troubleshooting-api-error-codes.html).
 
-An Anthropic overload can arrive as an HTTP `529` or as a `503` whose message says the model is overloaded. Treat both as the same capacity signal. LiteLLM 1.109.1 maps them differently:
+An Anthropic overload can arrive as an HTTP `529` or as a `503` whose message says the model is overloaded. Treat both as the same capacity signal. LiteLLM (measured on 1.109.1) maps them differently:
 
 | Bedrock status | LiteLLM exception | Retry count used |
 |---|---|---|
@@ -153,6 +153,7 @@ Expect a one-time spike in cache writes right after traffic moves. Track the cac
 ## Repository layout
 
 ```
+requirements.txt               # pinned Python dependencies (Dependabot keeps them current)
 proxy/
   litellm-config.yaml          # routing and fallback: EU -> global -> Claude Opus 5
   litellm-config-hard-eu.yaml  # hard primary-Region shape: EU, then US -> JP -> AU -> global
@@ -173,7 +174,7 @@ sdk/
 
 ## Prerequisites
 
-- Python 3.10 or later, with `pip install "litellm==1.109.1" boto3 aws-bedrock-token-generator pyyaml`. The tests were run on LiteLLM 1.109.1.
+- Python 3.10 or later, with the pinned dependencies installed: `pip install -r requirements.txt`. Dependabot proposes version updates, and CI runs `sdk/router_fallback_mock_test.py` on each one. The test fails if a new LiteLLM changes the behaviour this README documents.
 - An AWS account with access to Claude Opus 5.5 and Opus 5 in Amazon Bedrock. Confirm the inference profile IDs for your account with `aws bedrock list-inference-profiles --region <region>`.
 - AWS credentials in your shell, for example from `aws login` or a named profile. The scripts never read static keys from the code.
 - An IAM identity allowed to call `bedrock:InvokeModel` on the profiles you use. The log-based tests also need `logs:FilterLogEvents` on the log group, and `cloudtrail:LookupEvents` if you check CloudTrail.
@@ -194,13 +195,14 @@ To use the config in your own LiteLLM proxy, merge its `model_list` and `router_
 Run these from the `sdk/` folder.
 
 ```bash
+pip install -r requirements.txt
 cd sdk
 python router_fallback_mock_test.py   # no AWS calls; start here
 ```
 
 | Script | Needs AWS | Time | What it shows |
 |---|---|---|---|
-| `router_fallback_mock_test.py` | No | About 2 min | Exception type for 529 and 503, and the number of attempts across the three aliases. |
+| `router_fallback_mock_test.py` | No | About 2 min | Exception type for 529 and 503, and the number of attempts across the three aliases. Exits non-zero if either differs from this README. |
 | `router_fallback_live_test.py` | Yes | About 3 min | One request per alias, forced fallbacks, a 5-second timeout, and the invocation-log records. |
 | `cris-routing-by-model.py` | Yes | About 5 min | Serving Region for six models, 30 calls each. |
 | `cris-pinning-over-time.py --hours 24 --interval 15` | Yes | 24 h | Serving Region over time. Use `--hours 0.5 --interval 2` for a short check. Use `--report FILE.csv` to print a summary from a saved run. |

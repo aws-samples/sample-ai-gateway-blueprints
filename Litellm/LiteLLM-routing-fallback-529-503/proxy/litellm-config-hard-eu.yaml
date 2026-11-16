@@ -36,7 +36,8 @@
 # the entry Region; read `inferenceRegion` there for the actual serving Region.
 #
 # Replace the placeholder account 111111111111 in aws_role_name, or remove
-# aws_role_name to use the gateway's own credentials. Tested on LiteLLM 1.109.1.
+# aws_role_name to use the gateway's own credentials. Tested with the versions in
+# ../requirements.txt.
 # ===========================================================================
 
 model_list:
