@@ -58,10 +58,10 @@ sdk/
 - Set `LITELLM_ROLE_ARN` to a role your identity can assume. The live test uses it for every deployment.
 - Leave it unset. The live test drops `aws_role_name` and uses your calling credentials.
 
-To run the gateway with the config:
+To run the SDK tests against the config:
 
 ```bash
-pip install "litellm[proxy]==1.109.1"
+pip install "litellm==1.109.1" boto3 aws-bedrock-token-generator pyyaml
 python sdk/cris-routing-by-model.py
 ```
 
