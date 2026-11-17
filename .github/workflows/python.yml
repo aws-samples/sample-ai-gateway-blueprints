@@ -33,8 +33,10 @@ jobs:
   # Runs the offline LiteLLM Router test against proxy/litellm-config.yaml.
   # It fails if the installed LiteLLM changes the documented behaviour, which
   # gates Dependabot bumps of requirements.txt.
-  # Every Bedrock call is answered by an httpx MockTransport, so no AWS
-  # credentials are configured and no model is invoked.
+  # Every Bedrock call is answered by an httpx MockTransport, so no model is
+  # invoked. botocore still signs each request before it reaches the mock, so
+  # placeholder credentials are set; without them every call fails with
+  # "Unable to locate credentials" and no attempt is made.
   mock-test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -52,4 +54,6 @@ jobs:
         env:
           AWS_DEFAULT_REGION: eu-west-1
           AWS_EC2_METADATA_DISABLED: "true"
+          AWS_ACCESS_KEY_ID: testing-key-id-not-real
+          AWS_SECRET_ACCESS_KEY: testing-secret-not-real
         run: python router_fallback_mock_test.py
