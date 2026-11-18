@@ -21,3 +21,13 @@ updates:
       # 3.11+ drops Python 3.10, which the sample supports.
       - dependency-name: "matplotlib"
         versions: [">=3.11"]
+
+  # Strands agent client for the LiteLLM MCP gateway sample.
+  - package-ecosystem: "pip"
+    directory: "/Litellm/litellm-mcp-gateway/client"
+    schedule:
+      interval: "weekly"
+    ignore:
+      # agent.py uses the mcp 1.x streamablehttp_client API, renamed in 2.x.
+      - dependency-name: "mcp"
+        versions: [">=2"]
