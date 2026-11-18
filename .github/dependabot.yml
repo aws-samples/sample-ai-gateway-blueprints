@@ -31,3 +31,7 @@ updates:
       # agent.py uses the mcp 1.x streamablehttp_client API, renamed in 2.x.
       - dependency-name: "mcp"
         versions: [">=2"]
+      # strands-agents 1.65 requires litellm < 1.107. Remove this once a
+      # strands-agents release accepts a newer litellm.
+      - dependency-name: "litellm"
+        versions: [">=1.107"]
