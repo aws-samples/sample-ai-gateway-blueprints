@@ -34,7 +34,11 @@ An AI gateway sits between your applications or agents and the models and tools 
 │   │   ├── proxy/                          # LiteLLM proxy config for the routing and fallback setup
 │   │   ├── sdk/                            # Python Router tests and Bedrock placement measurement scripts
 │   │   └── images/                         # Architecture and behaviour diagrams
-│   └── litellm-mcp-gateway/                # (coming soon) LiteLLM as an MCP gateway
+│   └── litellm-mcp-gateway/                # LiteLLM as a governed MCP gateway for AgentCore agents
+│       ├── proxy/                          # LiteLLM proxy config with a read-only Confluence MCP server
+│       ├── scripts/                        # Register the MCP server and create a team key
+│       ├── client/                         # Strands agent that sends the gateway key and user token
+│       └── images/                         # Architecture diagram
 └── AgentCore-gateway/                      # (coming soon) Amazon Bedrock AgentCore Gateway samples
 ```
 
@@ -43,7 +47,7 @@ An AI gateway sits between your applications or agents and the models and tools 
 | Blueprint | Gateway | Status | What it shows |
 |-----------|---------|--------|---------------|
 | [LiteLLM routing and fallback for 529/503](Litellm/LiteLLM-routing-fallback-529-503/) | LiteLLM proxy and Python SDK | Available | Routing for Claude Opus 5.5 from the EU profile to the global profile, then fallback to Claude Opus 5. Retry, cooldown and timeout settings for Bedrock overload errors, and scripts that measure which Region serves each call |
-| LiteLLM MCP gateway | LiteLLM | Coming soon | Exposing and governing MCP tool servers through LiteLLM |
+| [LiteLLM MCP gateway](Litellm/litellm-mcp-gateway/) | LiteLLM proxy (community edition) | Available | Per-user Confluence access for Amazon Bedrock AgentCore agents through the Atlassian Rovo MCP server. A team virtual key decides which MCP tools an agent can call; the user's own OAuth token decides what Confluence returns |
 | AgentCore Gateway | Amazon Bedrock AgentCore Gateway | Coming soon | Turning APIs and Lambda functions into authenticated MCP tools for agents |
 
 ## Cost
