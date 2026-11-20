@@ -1,4 +1,4 @@
-# LiteLLM proxy config: governed, per-user MCP access to Confluence (Atlassian Rovo MCP)
+# LiteLLM proxy config: governed, per-user MCP access to Confluence (Atlassian MCP server v2)
 # Community edition. No Enterprise license required.
 
 model_list:
@@ -9,15 +9,15 @@ model_list:
 
 mcp_servers:
   atlassian_confluence_read:
-    url: "https://mcp.atlassian.com/v1/mcp/authv2"
+    url: "https://mcp.atlassian.com/v2/mcp?tools=all"   # flat tool list for gateways
     transport: "http"
     auth_type: "none"              # gateway holds no Confluence credential
     extra_headers: ["Authorization"]  # forward the caller's user token upstream
     description: "Confluence, read-only, acts as the calling user"
     allowed_tools:
-      - getConfluenceSpaces
-      - getConfluencePage
-      - getPagesInConfluenceSpace
+      - listConfluenceSpaces
+      - getConfluenceContent
+      - listConfluenceContent
       - getAccessibleAtlassianResources
       - atlassianUserInfo
     access_groups:

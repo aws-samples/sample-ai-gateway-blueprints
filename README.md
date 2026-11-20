@@ -47,7 +47,7 @@ An AI gateway sits between your applications or agents and the models and tools 
 | Blueprint | Gateway | Status | What it shows |
 |-----------|---------|--------|---------------|
 | [LiteLLM routing and fallback for 529/503](Litellm/LiteLLM-routing-fallback-529-503/) | LiteLLM proxy and Python SDK | Available | Routing for Claude Opus 5.5 from the EU profile to the global profile, then fallback to Claude Opus 5. Retry, cooldown and timeout settings for Bedrock overload errors, and scripts that measure which Region serves each call |
-| [LiteLLM MCP gateway](Litellm/litellm-mcp-gateway/) | LiteLLM proxy (community edition) | Available | Per-user Confluence access for Amazon Bedrock AgentCore agents through the Atlassian Rovo MCP server. A team virtual key decides which MCP tools an agent can call; the user's own OAuth token decides what Confluence returns |
+| [LiteLLM MCP gateway](Litellm/litellm-mcp-gateway/) | LiteLLM proxy (community edition) | Available | Per-user Confluence access for Amazon Bedrock AgentCore agents through the Atlassian MCP server (v2). A team virtual key decides which MCP tools an agent can call; the user's own OAuth token decides what Confluence returns |
 | AgentCore Gateway | Amazon Bedrock AgentCore Gateway | Coming soon | Turning APIs and Lambda functions into authenticated MCP tools for agents |
 
 ## Cost

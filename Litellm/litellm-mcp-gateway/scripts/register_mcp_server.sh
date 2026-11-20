@@ -11,12 +11,12 @@ curl -sS -X POST "$LITELLM_PROXY_URL/v1/mcp/server" \
   -H "Content-Type: application/json" \
   -d '{
     "server_name": "atlassian_confluence_read",
-    "url": "https://mcp.atlassian.com/v1/mcp/authv2",
+    "url": "https://mcp.atlassian.com/v2/mcp?tools=all",
     "transport": "http",
     "auth_type": "none",
     "extra_headers": ["Authorization"],
     "allowed_tools": [
-      "getConfluenceSpaces", "getConfluencePage", "getPagesInConfluenceSpace",
+      "listConfluenceSpaces", "getConfluenceContent", "listConfluenceContent",
       "getAccessibleAtlassianResources", "atlassianUserInfo"
     ],
     "mcp_access_groups": ["confluence_read"]
