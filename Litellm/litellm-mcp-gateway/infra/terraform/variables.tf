@@ -108,6 +108,17 @@ variable "vpc_cidr" {
   }
 }
 
+variable "availability_zones" {
+  description = "Availability Zone names to use (create_vpc = true), for example [\"eu-west-1a\", \"eu-west-1b\"]. Empty: the first az_count of the Region's zones a to f."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = alltrue([for z in var.availability_zones : can(regex("^[a-z]{2}(-[a-z]+)+-[0-9][a-z]$", z))])
+    error_message = "Use Availability Zone names such as eu-west-1a."
+  }
+}
+
 variable "az_count" {
   description = "Number of Availability Zones (create_vpc = true)."
   type        = number
@@ -116,6 +127,11 @@ variable "az_count" {
   validation {
     condition     = var.az_count >= 2 && var.az_count <= 3
     error_message = "Use 2 or 3 Availability Zones."
+  }
+
+  validation {
+    condition     = length(var.availability_zones) == 0 || length(var.availability_zones) >= var.az_count
+    error_message = "List at least az_count names in availability_zones."
   }
 }
 

@@ -1,8 +1,15 @@
 data "aws_caller_identity" "current" {}
 data "aws_partition" "current" {}
 
+# Zones are pinned by name, so the set (and the subnets built on it) does not change when AWS adds
+# an Availability Zone. Default: the Region's lettered zones a to f, in order.
 data "aws_availability_zones" "available" {
   state = "available"
+
+  filter {
+    name   = "zone-name"
+    values = length(var.availability_zones) > 0 ? var.availability_zones : [for l in ["a", "b", "c", "d", "e", "f"] : "${var.region}${l}"]
+  }
 
   filter {
     name   = "opt-in-status"
