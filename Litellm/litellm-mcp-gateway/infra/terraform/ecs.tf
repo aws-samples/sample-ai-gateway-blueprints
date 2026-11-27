@@ -49,8 +49,10 @@ locals {
   secret_arns = distinct([for value in values(local.secrets) : join(":", slice(split(":", value), 0, 7))])
 
   # LiteLLM needs no Linux capabilities (port 4000 is unprivileged); tested with all dropped.
+  # The empty lists here and in the container definitions match what ECS returns, so plans do
+  # not replace the task definition on every run.
   linux_parameters = {
-    capabilities       = { drop = ["ALL"] }
+    capabilities       = { add = [], drop = ["ALL"] }
     initProcessEnabled = true
   }
 
@@ -149,6 +151,9 @@ resource "aws_ecs_task_definition" "gateway" {
       entryPoint      = ["python3", "-c"]
       command         = [local.bootstrap_script]
       mountPoints     = [{ sourceVolume = "bootstrap", containerPath = "/bootstrap", readOnly = false }]
+      portMappings    = []
+      systemControls  = []
+      volumesFrom     = []
       linuxParameters = local.linux_parameters
       environment = [
         { name = "CONFIG_BUCKET", value = aws_s3_bucket.config.id },
@@ -166,7 +171,9 @@ resource "aws_ecs_task_definition" "gateway" {
       command         = ["--config", "/bootstrap/config.yaml", "--port", "4000"]
       dependsOn       = [{ containerName = "bootstrap", condition = "SUCCESS" }]
       mountPoints     = [{ sourceVolume = "bootstrap", containerPath = "/bootstrap", readOnly = true }]
-      portMappings    = [{ containerPort = 4000, protocol = "tcp" }]
+      portMappings    = [{ containerPort = 4000, hostPort = 4000, protocol = "tcp" }]
+      systemControls  = []
+      volumesFrom     = []
       linuxParameters = local.linux_parameters
       environment     = [for name, value in local.environment : { name = name, value = value }]
       secrets         = [for name, arn in local.secrets : { name = name, valueFrom = arn }]
