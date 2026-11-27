@@ -55,7 +55,9 @@ litellm-mcp-gateway/
 │   └── check_access.py              # List the user's tools and call one
 ├── option-a-enterprise-idp/         # Recommended: IdP sign-in, LiteLLM Enterprise
 │   ├── proxy/config.yaml
-│   └── client/                      # Strands Agents agent that sends the user's IdP token
+│   ├── client/                      # Strands Agents agent that sends the user's IdP token (local run)
+│   ├── agentcore/                   # The same agent on AgentCore Runtime: Dockerfile, runtime and IAM examples
+│   └── idp/cognito/                 # Worked example: Amazon Cognito as the IdP
 ├── option-b-virtual-key/            # LiteLLM community edition
 │   ├── proxy/config.yaml
 │   ├── scripts/add_user.sh          # One user and one virtual key per person
