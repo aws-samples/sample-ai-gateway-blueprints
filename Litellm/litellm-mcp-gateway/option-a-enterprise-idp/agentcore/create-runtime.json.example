@@ -1,0 +1,14 @@
+{
+  "agentRuntimeName": "confluence_agent",
+  "description": "Strands agent that calls the LiteLLM MCP gateway as the signed-in user",
+  "agentRuntimeArtifact": {"containerConfiguration": {"containerUri": "111122223333.dkr.ecr.eu-west-1.amazonaws.com/confluence-agent:1"}},
+  "roleArn": "arn:aws:iam::111122223333:role/confluence-agent-runtime",
+  "networkConfiguration": {"networkMode": "VPC", "networkModeConfig": {
+    "subnets": ["subnet-0example1", "subnet-0example2"],
+    "securityGroups": ["sg-0example1", "sg-0example2"]}},
+  "authorizerConfiguration": {"customJWTAuthorizer": {
+    "discoveryUrl": "https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_EXAMPLE/.well-known/openid-configuration",
+    "allowedAudience": ["https://litellm.internal.example.com"]}},
+  "requestHeaderConfiguration": {"requestHeaderAllowlist": ["Authorization"]},
+  "environmentVariables": {"LITELLM_PROXY_URL": "https://litellm.internal.example.com", "SSL_CERT_FILE": "/app/ca-bundle.pem"}
+}

@@ -1,7 +1,0 @@
-# Exact versions the sample is tested with (Atlassian MCP v2 through LiteLLM proxy
-# 1.109.1, November 2026). Dependabot proposes updates.
-# strands-agents 1.65 requires litellm < 1.107, and agent.py uses the mcp 1.x
-# streamablehttp_client API (renamed in mcp 2.x).
-strands-agents[litellm]==1.65.0
-litellm==1.106.10
-mcp==1.30.0

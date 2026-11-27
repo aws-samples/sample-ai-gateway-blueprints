@@ -1,0 +1,74 @@
+# Option B: LiteLLM community edition (no license).
+# Users are identified by their own LiteLLM virtual key. The gateway is the OAuth client of the
+# Atlassian Rovo MCP server (v2) and keeps one encrypted Atlassian token per user.
+# Keep this file in version control and deploy it through review (infra/terraform pins each
+# version). The community edition writes no audit log, so changes made through the API leave no record.
+
+model_list:
+  - model_name: claude-sonnet
+    litellm_params:
+      model: bedrock/eu.anthropic.claude-sonnet-4-6
+      aws_region_name: eu-west-1            # credentials come from the ECS task role
+
+mcp_servers:
+  atlassian_confluence:                     # tool names are prefixed "atlassian_confluence-"
+    server_id: atlassian-confluence         # stable id, referenced by team tool permissions
+    url: "https://mcp.atlassian.com/v2/mcp?tools=all"
+    transport: http
+    description: "Confluence, read-only, acts as the calling user"
+    auth_type: oauth2
+    oauth2_flow: authorization_code         # three-legged OAuth (3LO): each user consents once
+    # v2 authorization server, from the v2 protected resource metadata (not the host root)
+    authorization_url: https://auth.atlassian.com/authorize
+    token_url: https://auth.atlassian.com/oauth/token
+    client_id: os.environ/ATLASSIAN_CLIENT_ID          # from scripts/register_atlassian_client.py
+    client_secret: os.environ/ATLASSIAN_CLIENT_SECRET  # stored in AWS Secrets Manager
+    upstream_resource: https://mcp.atlassian.com/v2/mcp   # RFC 8707; without it Atlassian rejects the token
+    scopes:                                 # the default request; users can ask for more at consent,
+                                            # so allowed_tools, not the scope list, is the control
+      - read:me
+      - read:account
+      - read:confluence:agent-interface
+      - search:confluence:agent-interface
+      - offline_access                      # lets the gateway refresh the token unattended
+    allowed_tools:                          # always explicit: an empty list exposes every upstream tool
+      - listConfluenceSpaces
+      - listConfluenceContent
+      - getConfluenceContent
+      - getAccessibleAtlassianResources
+      - atlassianUserInfo
+    available_on_public_internet: false     # reachable from private (internal) addresses only
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY      # break-glass admin only
+  # Database: set DATABASE_URL, or DATABASE_HOST/USERNAME/PASSWORD/NAME (the Terraform in infra/ does this).
+  # Do not add database_url here: it stops LiteLLM from building the URL from those variables.
+  store_model_in_db: false                       # keep models out of the database. Proxy admins can still
+                                                 # add MCP servers through the API; those go live at once,
+                                                 # so keep the admin role to a few named people
+
+litellm_settings:
+  drop_params: true
+  # Only administrators issue keys. Without this, any user can mint extra keys for themselves
+  # (no expiry by default), and those keys outlive offboarding of the key you issued.
+  key_generation_settings:
+    personal_key_generation:
+      allowed_user_roles: ["proxy_admin"]
+    team_key_generation:
+      allowed_team_member_roles: ["admin"]
+  upperbound_key_generate_params:
+    duration: "30d"                         # no key lives longer than 30 days
+
+# Optional: screen Confluence content with an Amazon Bedrock guardrail when the agent sends tool
+# results back to the model through the gateway (Bedrock has no post_mcp_call hook in 1.109.1).
+# Allow the guardrail in infra/terraform with bedrock_guardrail_arns.
+# guardrails:
+#   - guardrail_name: confluence-tool-results
+#     litellm_params:
+#       guardrail: bedrock
+#       mode: pre_call
+#       default_on: true
+#       scan_only_tool_results: true
+#       guardrailIdentifier: os.environ/BEDROCK_GUARDRAIL_ID
+#       guardrailVersion: os.environ/BEDROCK_GUARDRAIL_VERSION
+#       aws_region_name: eu-west-1

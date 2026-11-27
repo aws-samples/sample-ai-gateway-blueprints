@@ -22,16 +22,26 @@ updates:
       - dependency-name: "matplotlib"
         versions: [">=3.11"]
 
-  # Strands agent client for the LiteLLM MCP gateway sample.
+  # Strands agent clients of the LiteLLM MCP gateway sample (both options pin the same versions).
   - package-ecosystem: "pip"
-    directory: "/Litellm/litellm-mcp-gateway/client"
+    directories:
+      - "/Litellm/litellm-mcp-gateway/option-a-enterprise-idp/client"
+      - "/Litellm/litellm-mcp-gateway/option-b-virtual-key/client"
     schedule:
       interval: "weekly"
+    groups:
+      mcp-gateway-client:
+        patterns: ["*"]
     ignore:
-      # agent.py uses the mcp 1.x streamablehttp_client API, renamed in 2.x.
+      # strands-agents 1.67 requires mcp < 2.4 and litellm < 1.107. Remove these once a
+      # strands-agents release accepts newer versions.
       - dependency-name: "mcp"
-        versions: [">=2"]
-      # strands-agents 1.65 requires litellm < 1.107. Remove this once a
-      # strands-agents release accepts a newer litellm.
+        versions: [">=2.4"]
       - dependency-name: "litellm"
         versions: [">=1.107"]
+
+  # Terraform providers of the LiteLLM MCP gateway infrastructure (.terraform.lock.hcl).
+  - package-ecosystem: "terraform"
+    directory: "/Litellm/litellm-mcp-gateway/infra/terraform"
+    schedule:
+      interval: "weekly"
