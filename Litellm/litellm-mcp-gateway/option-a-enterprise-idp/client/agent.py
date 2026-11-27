@@ -5,9 +5,8 @@ provider, as "Authorization: Bearer". The gateway validates it, maps the user's 
 LiteLLM teams, and calls Atlassian with the Atlassian token it holds for that user. The agent
 never holds an Atlassian token and needs no LiteLLM key.
 
-In Amazon Bedrock AgentCore Runtime, the user's token reaches the agent as the inbound
-Authorization header (configure a JWT authorizer and allow the Authorization header); pass it
-to ask() for each request. Run locally with USER_ACCESS_TOKEN set.
+Run locally with USER_ACCESS_TOKEN set. For Amazon Bedrock AgentCore Runtime, deploy
+../agentcore/ instead: its entrypoint passes the inbound Authorization header to the same ask().
 """
 import os
 

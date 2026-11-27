@@ -1,0 +1,19 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {"Sid": "ECRImageAccess", "Effect": "Allow", "Action": ["ecr:BatchGetImage", "ecr:GetDownloadUrlForLayer"],
+     "Resource": ["arn:aws:ecr:eu-west-1:111122223333:repository/confluence-agent"]},
+    {"Sid": "ECRTokenAccess", "Effect": "Allow", "Action": ["ecr:GetAuthorizationToken"], "Resource": "*"},
+    {"Sid": "LogGroups", "Effect": "Allow", "Action": ["logs:DescribeLogStreams", "logs:CreateLogGroup"],
+     "Resource": ["arn:aws:logs:eu-west-1:111122223333:log-group:/aws/bedrock-agentcore/runtimes/*"]},
+    {"Sid": "DescribeLogGroups", "Effect": "Allow", "Action": ["logs:DescribeLogGroups"],
+     "Resource": ["arn:aws:logs:eu-west-1:111122223333:log-group:*"]},
+    {"Sid": "LogStreams", "Effect": "Allow", "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+     "Resource": ["arn:aws:logs:eu-west-1:111122223333:log-group:/aws/bedrock-agentcore/runtimes/*:log-stream:*"]},
+    {"Sid": "XRay", "Effect": "Allow",
+     "Action": ["xray:PutTraceSegments", "xray:PutTelemetryRecords", "xray:GetSamplingRules", "xray:GetSamplingTargets"],
+     "Resource": ["*"]},
+    {"Sid": "Metrics", "Effect": "Allow", "Action": "cloudwatch:PutMetricData", "Resource": "*",
+     "Condition": {"StringEquals": {"cloudwatch:namespace": "bedrock-agentcore"}}}
+  ]
+}

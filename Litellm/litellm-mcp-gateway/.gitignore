@@ -3,3 +3,6 @@ atlassian-oauth-client.json
 *.key
 __pycache__/
 .venv/
+# Filled from create-runtime.json.example with your account IDs, and your private CA chain.
+option-a-enterprise-idp/agentcore/create-runtime.json
+option-a-enterprise-idp/agentcore/private-ca.pem

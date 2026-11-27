@@ -71,10 +71,11 @@ Deploy the infrastructure with `edition = "enterprise"`, store the license and t
 
 ## Run the agent on Amazon Bedrock AgentCore Runtime
 
-- Configure the runtime with an [inbound JWT authorizer](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-oauth.html) for the same IdP, so AgentCore accepts only signed-in users.
-- Add `Authorization` to the runtime's [request header allowlist](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-header-allowlist.html). AgentCore passes the `Authorization` header to your code only when a custom JWT authorizer is configured.
-- For each request, strip the `Bearer ` prefix and pass the token to `ask()` in [`client/agent.py`](client/agent.py). Never cache it across users, and never fall back to a shared credential.
-- Run the runtime in VPC mode in subnets that can reach the internal load balancer, and attach the `gateway_clients_security_group_id` security group from the Terraform outputs.
+[`agentcore/`](agentcore/) has the tested entrypoint, Dockerfile, runtime and IAM examples, and the build, create and invoke commands. In short:
+
+- The runtime has an [inbound JWT authorizer](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-oauth.html) for the same IdP, so AgentCore accepts only signed-in users, and `Authorization` in its [request header allowlist](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-header-allowlist.html). AgentCore passes the `Authorization` header to your code only when a custom JWT authorizer is configured.
+- For each request, the entrypoint strips the `Bearer ` prefix and passes the token to `ask()`. It never caches the token across users and never falls back to a shared credential.
+- The runtime runs in VPC mode in subnets that can reach the internal load balancer, with the `gateway_clients_security_group_id` security group from the Terraform outputs.
 - The audience in the token must be accepted by both the AgentCore authorizer and LiteLLM (`JWT_AUDIENCE`).
 
 ## What to test
