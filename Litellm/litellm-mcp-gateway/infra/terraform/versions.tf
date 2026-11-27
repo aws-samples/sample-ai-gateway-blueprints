@@ -17,7 +17,12 @@ terraform {
 provider "aws" {
   region = var.region
 
+  # IAM tag keys are case-insensitive: a caller tag such as "project" next to the default
+  # "Project" fails every IAM role with duplicate tag keys, so the caller key wins.
   default_tags {
-    tags = merge({ Project = var.name, ManagedBy = "terraform" }, var.tags)
+    tags = merge(
+      { for k, v in { Project = var.name, ManagedBy = "terraform" } : k => v if !contains([for t in keys(var.tags) : lower(t)], lower(k)) },
+      var.tags,
+    )
   }
 }
