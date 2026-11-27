@@ -16,5 +16,6 @@ jwt_public_key_url = "https://idp.example.com/oauth2/v1/keys"
 jwt_issuer         = "https://idp.example.com"
 jwt_audience       = "litellm"
 
-# First apply with 0 tasks; store the secrets; then set 2.
+# First apply with 0 tasks; store the secrets; then set 1. MCP sessions live in one task's
+# memory in LiteLLM 1.109.1: keep 1 task, or set target_group_stickiness = true (untested) for more.
 desired_count = 0

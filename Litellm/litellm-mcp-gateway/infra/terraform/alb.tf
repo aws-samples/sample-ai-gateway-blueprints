@@ -94,6 +94,12 @@ resource "aws_lb_target_group" "this" {
   vpc_id               = local.vpc_id
   deregistration_delay = 30
 
+  stickiness {
+    type            = "lb_cookie"
+    enabled         = var.target_group_stickiness
+    cookie_duration = 86400
+  }
+
   health_check {
     path                = "/health/liveliness"
     matcher             = "200"

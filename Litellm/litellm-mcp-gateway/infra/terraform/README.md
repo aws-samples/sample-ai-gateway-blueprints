@@ -48,7 +48,7 @@ Run these from the `litellm-mcp-gateway` folder, starting with `cd infra/terrafo
      --secret-id "$(terraform output -raw license_secret_arn)" --secret-string file:///dev/stdin
    unset LICENSE
    ```
-4. **Start the gateway.** Set `desired_count = 2` in `terraform.tfvars`, then run `terraform plan -out tfplan` and `terraform apply tfplan` again.
+4. **Start the gateway.** Set `desired_count = 1` in `terraform.tfvars`, then run `terraform plan -out tfplan` and `terraform apply tfplan` again. Keep one task: see [MCP sessions and task count](#mcp-sessions-and-task-count).
 5. **DNS.** If you did not set `route53_private_zone_id`, point `gateway_hostname` at `load_balancer_dns_name` in your private DNS.
 6. **Check health.** From a client on an allowed range (or through the [port forward](#reach-the-gateway-as-an-administrator), on port 8443):
    ```bash
@@ -82,6 +82,15 @@ export LITELLM_ADMIN_KEY="$(aws secretsmanager get-secret-value \
 Then [configure SSO for the Admin UI](https://docs.litellm.ai/docs/proxy/admin_ui_sso) through `gateway_extra_environment` and `gateway_extra_secrets`, so every change is attributed to a named administrator, and keep the master key as break-glass only.
 
 `connect_atlassian.py` also works through the port forward: set `GATEWAY_URL=https://<gateway_hostname>:8443`. After consent the browser page does not load, because Atlassian redirects to port 443; copy its address anyway.
+
+## MCP sessions and task count
+
+LiteLLM 1.109.1 keeps each MCP session (the `mcp-session-id` from `initialize`, with its auth context and upstream session) in the memory of the task that created it, and has no shared session store. When a request of that session reaches another task, the gateway logs `MCP session ID ... not found in this worker's memory`, drops the header and serves the request without that session; in our test with two tasks, one `POST /mcp/` returned HTTP 400 before the client recovered. The MCP client in the sample agents always initializes a session, so there is no stateless mode to fall back to.
+
+Until LiteLLM has a shared session store, use one of these:
+
+- **One task** (`desired_count = 1`, tested). Fargate replaces a failed task and the deployment circuit breaker rolls back a bad revision, but a task replacement ends open sessions.
+- **Sticky sessions** (`target_group_stickiness = true` with `desired_count` above 1, untested). The load balancer sets a cookie that keeps each client on one task; this works only if the client keeps cookies for the life of the session.
 
 ## AWS WAF
 

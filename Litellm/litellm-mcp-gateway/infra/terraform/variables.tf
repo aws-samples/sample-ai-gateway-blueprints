@@ -172,7 +172,7 @@ variable "enable_interface_endpoints" {
 # ---- Gateway -------------------------------------------------------------
 
 variable "desired_count" {
-  description = "Number of gateway tasks. Keep 0 for the first apply, store the Atlassian client (and license) secrets, then raise it."
+  description = "Number of gateway tasks. Keep 0 for the first apply, store the Atlassian client (and license) secrets, then set 1. LiteLLM 1.109.1 keeps MCP sessions in per-task memory, so run one task (tested) or enable target_group_stickiness (untested) until LiteLLM has a shared session store."
   type        = number
   default     = 0
 
@@ -180,6 +180,12 @@ variable "desired_count" {
     condition     = var.desired_count >= 0 && floor(var.desired_count) == var.desired_count
     error_message = "Use a whole number, 0 or more."
   }
+}
+
+variable "target_group_stickiness" {
+  description = "Untested: load balancer cookie stickiness on the gateway target group, so each MCP session stays on the task that holds it in memory. Needed only with desired_count above 1."
+  type        = bool
+  default     = false
 }
 
 variable "task_cpu" {
