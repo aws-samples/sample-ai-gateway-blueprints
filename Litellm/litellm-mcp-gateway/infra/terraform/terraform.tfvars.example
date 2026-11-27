@@ -1,0 +1,20 @@
+# Copy to terraform.tfvars and adjust. Do not commit terraform.tfvars.
+edition          = "enterprise" # or "community" for option B
+region           = "eu-west-1"
+gateway_hostname = "litellm.internal.example.com"
+certificate_arn  = "arn:aws:acm:eu-west-1:111122223333:certificate/00000000-0000-0000-0000-000000000000"
+
+# Private ranges that may call the gateway (corporate network, VPN). Only RFC 1918 or 100.64.0.0/10
+# ranges are accepted. Keep them narrow: every range listed here also reaches the admin API.
+allowed_client_cidrs = ["10.10.0.0/16"]
+
+# Optional: alias record in an existing private hosted zone.
+# route53_private_zone_id = "Z0123456789ABCDEFGHIJ"
+
+# Option A only: your identity provider.
+jwt_public_key_url = "https://idp.example.com/oauth2/v1/keys"
+jwt_issuer         = "https://idp.example.com"
+jwt_audience       = "litellm"
+
+# First apply with 0 tasks; store the secrets; then set 2.
+desired_count = 0

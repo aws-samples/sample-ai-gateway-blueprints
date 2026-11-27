@@ -26,10 +26,11 @@ jobs:
         uses: bridgecrewio/checkov-action@3f0caf0c3aa9f56ade6b49f6e60b63aaeafb75a3 # v12.3141.0
         with:
           directory: .
-          # Hard-coded secrets in any file, and insecure patterns in these workflows.
-          # Add frameworks (for example terraform, cloudformation, kubernetes, dockerfile)
-          # when a blueprint ships infrastructure code.
-          framework: secrets,github_actions
+          # Hard-coded secrets in any file, insecure patterns in these workflows, and the
+          # Terraform of the blueprints that ship infrastructure (accepted findings are
+          # skipped inline with a reason). Add frameworks (for example cloudformation,
+          # kubernetes, dockerfile) when a blueprint ships that kind of code.
+          framework: secrets,github_actions,terraform
           # This will add both a CLI output to the console and create a results.sarif file
           output_format: cli,sarif
           output_file_path: console,results.sarif

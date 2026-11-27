@@ -1,0 +1,5 @@
+# Written by scripts/register_atlassian_client.py and option-b-virtual-key/scripts/add_user.sh: secrets.
+atlassian-oauth-client.json
+*.key
+__pycache__/
+.venv/
